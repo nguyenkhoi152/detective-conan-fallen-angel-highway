@@ -21,9 +21,30 @@ int findMaxSpeed(int speed[], int size){
     return maxspeed;  
     }
 
-double calculateSuspicion(int suspectSpeed, double blackRiderSpeed, int 
-cameraMatch, int vehicleMatch, int evidence, int alibi){
 
+double calculateSuspicion(int suspectSpeed, double blackRiderSpeed,
+                          int cameraMatch, int vehicleMatch,
+                          int evidence, int alibi) {
+    double suspicion = 0;
+    double speedDiff = abs(suspectSpeed - blackRiderSpeed);
+
+    if (speedDiff <= 10) { suspicion += 30; }
+    else if (speedDiff <= 30) { suspicion += 15; }
+
+    if (cameraMatch >= 80) { suspicion += 30; }
+    else if (cameraMatch >= 50) { suspicion += 15; }
+
+    if (vehicleMatch >= 80) { suspicion += 25; }
+    else if (vehicleMatch >= 50) { suspicion += 10; }
+
+    suspicion += evidence * 10;
+
+    if (alibi == 1) { suspicion -= 40; }
+
+    if (suspicion < 0) { suspicion = 0; }
+    else if (suspicion > 100) { suspicion = 100; }
+
+    return suspicion;
 }
 int findPrimeSuspect(double suspicion[], int evidence[], int cameraMatch[], 
 int size){
@@ -77,31 +98,14 @@ double scene2(int segmentSpeed[], int N){
         cout << "[Scene 2] Estimated Black Rider Speed " << fixed << setprecision(1) << blackRiderSpeed << " km/h" <<'\n' ;
     return blackRiderSpeed;
     }
-
 void scene3(double blackRiderSpeed, int speed[], int N,
             double suspicion[], int cameraMatch[], int vehicleMatch[],
             int evidence[], int alibi[]) {
-    double speedDiff[5];
-
-    for (int i = 0; i < N; i++) {
-        suspicion[i] = 0;
-        speedDiff[i] = abs(speed[i] - blackRiderSpeed);
-
-        if (speedDiff[i] <= 10) { suspicion[i] += 30; }
-        else if (speedDiff[i] <= 30) { suspicion[i] += 15; }
-
-        if (cameraMatch[i] >= 80) { suspicion[i] += 30; }
-        else if (cameraMatch[i] >= 50) { suspicion[i] += 15; }
-
-        if (vehicleMatch[i] >= 80) { suspicion[i] += 25; }
-        else if (vehicleMatch[i] >= 50) { suspicion[i] += 10; }
-
-        suspicion[i] += evidence[i] * 10;
-
-        if (alibi[i] == 1) { suspicion[i] -= 40; }
-
-        if (suspicion[i] < 0) { suspicion[i] = 0; }
-        else if (suspicion[i] > 100) { suspicion[i] = 100; }
+    for (int i = 0; i < N; ++i) {
+        suspicion[i] = calculateSuspicion(
+            speed[i], blackRiderSpeed, cameraMatch[i],
+            vehicleMatch[i], evidence[i], alibi[i]
+        );
 
         string status;
         if (suspicion[i] >= 80) { status = "PRIME SUSPECT"; }
@@ -114,7 +118,8 @@ void scene3(double blackRiderSpeed, int speed[], int N,
              << fixed << setprecision(1)
              << suspicion[i] << " - " << status << '\n';
     }
-}
+            }
+void scene4(){}
 int main()
 { 
 

@@ -1,0 +1,12 @@
+# Compiled files
+*.exe
+*.o
+*.obj
+*.out
+
+# Local build and editor settings
+build/
+.vscode/
+
+# Keep expected test outputs
+!tests/*.out

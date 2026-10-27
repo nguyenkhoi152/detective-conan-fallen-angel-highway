@@ -72,12 +72,49 @@ for (int i = 1; i < M; ++i) {
     cout << "[Scene 1] Critical segment: " << highestRiskScore << '\n';    
 }
 
-void scene2(int segmentSpeed[], int N){
+double scene2(int segmentSpeed[], int N){
     double blackRiderSpeed = calculateAverageSpeed(segmentSpeed, N)*0.4 + findMaxSpeed(segmentSpeed, N)*0.6;
-    cout << "[Scene 2] Estimated Black Rider Speed " << fixed << setprecision(1) << blackRiderSpeed << " km/h" ;
+        cout << "[Scene 2] Estimated Black Rider Speed " << fixed << setprecision(1) << blackRiderSpeed << " km/h" <<'\n' ;
+    return blackRiderSpeed;
+    }
+
+void scene3(double blackRiderSpeed, int speed[], int N,
+            double suspicion[], int cameraMatch[], int vehicleMatch[],
+            int evidence[], int alibi[]) {
+    double speedDiff[5];
+
+    for (int i = 0; i < N; i++) {
+        suspicion[i] = 0;
+        speedDiff[i] = abs(speed[i] - blackRiderSpeed);
+
+        if (speedDiff[i] <= 10) { suspicion[i] += 30; }
+        else if (speedDiff[i] <= 30) { suspicion[i] += 15; }
+
+        if (cameraMatch[i] >= 80) { suspicion[i] += 30; }
+        else if (cameraMatch[i] >= 50) { suspicion[i] += 15; }
+
+        if (vehicleMatch[i] >= 80) { suspicion[i] += 25; }
+        else if (vehicleMatch[i] >= 50) { suspicion[i] += 10; }
+
+        suspicion[i] += evidence[i] * 10;
+
+        if (alibi[i] == 1) { suspicion[i] -= 40; }
+
+        if (suspicion[i] < 0) { suspicion[i] = 0; }
+        else if (suspicion[i] > 100) { suspicion[i] = 100; }
+
+        string status;
+        if (suspicion[i] >= 80) { status = "PRIME SUSPECT"; }
+        else if (suspicion[i] >= 60) { status = "HIGHLY SUSPICIOUS"; }
+        else if (suspicion[i] >= 40) { status = "SUSPICIOUS"; }
+        else if (suspicion[i] >= 20) { status = "PERSON OF INTEREST"; }
+        else { status = "LOW SUSPICION"; }
+
+        cout << "[Scene 3] Suspect " << i + 1 << ": "
+             << fixed << setprecision(1)
+             << suspicion[i] << " - " << status << '\n';
+    }
 }
-
-
 int main()
 { 
 
@@ -119,7 +156,9 @@ for (int i = 0; i < N; ++i)
         >> vehicleMatch[i] >> evidence[i];
 }
 scene1(segmentSpeed, speedLimit, danger, M);
-scene2(segmentSpeed, M);
+blackRiderSpeed = scene2(segmentSpeed, M);
+scene3(blackRiderSpeed, speed, N, suspicion,
+       cameraMatch, vehicleMatch, evidence, alibi);
 return 0;
 }
 
